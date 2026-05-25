@@ -35,14 +35,29 @@ INSTALL_NAME_TOOL_ARGS = -add_rpath @loader_path/../Frameworks
 
 .PHONY: librime copy-rime-binaries
 
-$(RIME_LIBRARY):
-	$(MAKE) librime
+RIME_DIST_DYLIB = $(RIME_LIB_DIR)/$(RIME_LIBRARY_FILE_NAME)
+
+ifdef BOOST_ROOT
+LIBRIME_BUILD_FLAGS += BOOST_ROOT="$(BOOST_ROOT)"
+endif
+
+$(RIME_DIST_DYLIB): FORCE
+	@need_build=0; \
+	if [ ! -f "$@" ]; then need_build=1; \
+	elif [ -n "$$(find librime/src librime/plugins -name '*.cc' -o -name '*.h' -newer "$@" 2>/dev/null)" ]; then need_build=1; \
+	fi; \
+	if [ "$$need_build" = "1" ]; then \
+		$(MAKE) -C librime release install $(LIBRIME_BUILD_FLAGS); \
+	fi
+
+$(RIME_LIBRARY): $(RIME_DIST_DYLIB)
+	$(MAKE) copy-rime-binaries
 
 $(RIME_DEPS):
 	$(MAKE) -C librime deps
 
 librime: $(RIME_DEPS)
-	$(MAKE) -C librime release install
+	$(MAKE) -C librime release install $(LIBRIME_BUILD_FLAGS)
 	$(MAKE) copy-rime-binaries
 
 copy-rime-binaries:
@@ -194,3 +209,5 @@ clean-deps:
 	$(MAKE) -C librime clean
 	rm -rf librime/dist > /dev/null 2>&1 || true
 	$(MAKE) clean-sparkle
+
+FORCE:
