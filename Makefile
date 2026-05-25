@@ -68,6 +68,20 @@ copy-rime-binaries:
 	$(INSTALL_NAME_TOOL) $(INSTALL_NAME_TOOL_ARGS) bin/rime_deployer
 	$(INSTALL_NAME_TOOL) $(INSTALL_NAME_TOOL_ARGS) bin/rime_dict_manager
 
+.PHONY: update-rime
+update-rime:
+	@echo "[1/3] 编译 librime..."
+	@$(MAKE) -C librime release install $(LIBRIME_BUILD_FLAGS)
+	@echo "[2/3] 替换已安装的 dylib 和插件..."
+	cp -L $(RIME_LIB_DIR)/$(RIME_LIBRARY_FILE_NAME) "$(SQUIRREL_APP_ROOT)/Contents/Frameworks/"
+	cp -pR $(RIME_LIB_DIR)/rime-plugins "$(SQUIRREL_APP_ROOT)/Contents/Frameworks/"
+	cp $(RIME_BIN_DIR)/rime_deployer "$(SQUIRREL_APP_ROOT)/Contents/MacOS/"
+	cp $(RIME_BIN_DIR)/rime_dict_manager "$(SQUIRREL_APP_ROOT)/Contents/MacOS/"
+	@echo "[3/3] 重新签名..."
+	codesign --force --deep --sign - "$(SQUIRREL_APP_ROOT)"
+	@echo "完成。重启 Squirrel 进程..."
+	pkill -f Squirrel || true
+
 .PHONY: data plum-data opencc-data copy-plum-data copy-opencc-data
 
 data: plum-data opencc-data
