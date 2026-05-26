@@ -5,7 +5,7 @@ description: 提交代码到三个仓库（librime, squirrel, Rime配置），�
 
 # Commit Skill
 
-提交本项目的代码变更。涉及三个仓库：librime（C++ 引擎）、squirrel（macOS 前端）、Rime 配置（~/Library/Rime）。
+提交本项目的代码变更。涉及三个仓库：`librime/`（C++ 引擎）、squirrel（macOS 前端）、Rime 配置（`~/Library/Rime`）。
 
 ## 提交流程
 
