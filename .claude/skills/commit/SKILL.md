@@ -19,7 +19,15 @@ echo "=== Rime ===" && git -C ~/Library/Rime status --short
 
 ### 2. 向用户展示变更摘要
 
-列出每个仓库的变更文件，让用户确认。**不要自动提交。**
+列出每个仓库的变更摘要和拟定的 commit message，然后使用 `AskUserQuestion` 工具让用户选择是否提交。**不要自动提交。**
+
+问题示例：
+- question: "是否提交以上变更？"
+- header: "确认提交"
+- options:
+  - label: "提交"（描述：按上述 message 执行提交）
+  - label: "取消"（描述：不做任何操作）
+  - label: "修改 message"（描述：用户可自行输入修改后的 message）
 
 ### 3. 生成 commit message
 
