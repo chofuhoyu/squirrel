@@ -7,9 +7,15 @@ description: 提交代码到三个仓库（librime, squirrel, Rime配置），�
 
 提交本项目的代码变更。涉及三个仓库：`librime/`（C++ 引擎）、squirrel（macOS 前端）、Rime 配置（`~/Library/Rime`）。
 
+## 🚨 关键规则（违反即为失败）
+
+1. **绝对不要自动提交。** 必须先用 `AskUserQuestion` 工具弹框让用户确认。
+2. 用户确认前，只能做展示和分析，不能执行任何 `git commit`。
+3. 该规则适用于/commit被调用时的每一次提交确认，没有例外。
+
 ## 提交流程
 
-### 1. 检查变更
+### 1. 检查变更并展示摘要
 
 ```bash
 echo "=== librime ===" && git -C librime status --short
@@ -17,19 +23,27 @@ echo "=== squirrel ===" && git status --short
 echo "=== Rime ===" && git -C ~/Library/Rime status --short
 ```
 
-### 2. 向用户展示变更摘要
+列出每个仓库的变更摘要和拟定的 commit message。
 
-列出每个仓库的变更摘要和拟定的 commit message，然后使用 `AskUserQuestion` 工具让用户选择是否提交。**不要自动提交。**
+### 2. 弹出确认框（必须）
 
-问题示例：
-- question: "是否提交以上变更？"
-- header: "确认提交"
-- options:
-  - label: "提交"（描述：按上述 message 执行提交）
-  - label: "取消"（描述：不做任何操作）
-  - label: "修改 message"（描述：用户可自行输入修改后的 message）
+**必须调用 `AskUserQuestion` 工具**，让用户选择是否提交。在用户做出选择之前，不执行任何 git 操作。
 
-### 3. 生成 commit message
+```
+AskUserQuestion({
+  questions: [{
+    question: "是否提交以上变更？",
+    header: "确认提交",
+    options: [
+      {label: "提交", description: "按上述 message 执行提交"},
+      {label: "取消", description: "不做任何操作"},
+      {label: "修改 message", description: "用户可自行输入修改后的 message"}
+    ]
+  }]
+})
+```
+
+### 3. 生成 commit message（格式参考）
 
 遵循已有风格：
 
